@@ -4,7 +4,7 @@ langgraph==0.0.20
 langchain==0.0.335
 langchain-community==0.0.10
 langchain-deepseek==0.1.0
-langchain-chroma==0.0.5
+langchain-chroma==0.1.2
 chromadb==0.4.18
 docx2txt==0.8
 python-dotenv==1.0.0
