@@ -10,3 +10,4 @@ docx2txt
 python-dotenv
 requests
 gunicorn
+dashscope
