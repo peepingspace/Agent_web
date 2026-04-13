@@ -13,7 +13,7 @@ const routeLine = document.getElementById("routeLine");
 let currentAgent = agents[0];
 
 // 从环境变量或配置中获取后端地址
-const BACKEND_URL = window.ENV?.BACKEND_URL || 'http://localhost:5000';
+const BACKEND_URL = window.ENV?.BACKEND_URL || 'https://agent-web-l9y3.onrender.com';
 
 function renderAgentTabs() {
   agentTabs.innerHTML = "";
