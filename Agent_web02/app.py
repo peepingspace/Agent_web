@@ -20,7 +20,7 @@ except Exception as e:
 
 print("\n[2/3] 导入 Agent 模块...")
 try:
-    from final08 import build_graph
+    from Agent import build_graph
     print("✓ Agent 模块导入成功")
 except Exception as e:
     print(f"✗ Agent 模块导入失败: {e}")
@@ -97,3 +97,4 @@ if __name__ == '__main__':
     print("💬 API: http://0.0.0.0:{port}/api/chat")
     print("\n按 Ctrl+C 停止服务\n")
     app.run(host='0.0.0.0', port=port, debug=False)
+    print(f"✓ Agent 模块最后修改时间: {os.path.getmtime('Agent.py')}")
