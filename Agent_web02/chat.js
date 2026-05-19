@@ -15,7 +15,7 @@ let currentAgent = agents[0];
 // 从环境变量或配置中获取后端地址
 const BACKEND_URL = window.ENV?.BACKEND_URL || 'https://agent-web-l9y3.onrender.com';
 //const BACKEND_URL = "http://127.0.0.1:5000";
-//const API_URL = `${BACKEND_URL}/api/chat`;
+const API_URL = `${BACKEND_URL}/api/chat`;
 function renderAgentTabs() {
   agentTabs.innerHTML = "";
   agents.forEach((agent) => {
