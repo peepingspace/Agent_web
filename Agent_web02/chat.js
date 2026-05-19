@@ -14,7 +14,8 @@ let currentAgent = agents[0];
 
 // 从环境变量或配置中获取后端地址
 const BACKEND_URL = window.ENV?.BACKEND_URL || 'https://agent-web-l9y3.onrender.com';
-
+//const BACKEND_URL = "http://127.0.0.1:5000";
+//const API_URL = `${BACKEND_URL}/api/chat`;
 function renderAgentTabs() {
   agentTabs.innerHTML = "";
   agents.forEach((agent) => {
@@ -59,6 +60,7 @@ async function sendMessageToBackend(question) {
     return data;
   } catch (error) {
     console.error('Error:', error);
+    alert('连接后端失败: ' + error.message + '\n请确保已运行 python app.py');
     throw error;
   }
 }
@@ -77,6 +79,7 @@ async function sendMessage() {
   chatInput.value = "";
   chatBoard.scrollTop = chatBoard.scrollHeight;
 
+  // 显示加载状态
   const loadingMsg = document.createElement("div");
   loadingMsg.className = "msg bot";
   loadingMsg.textContent = "正在思考中...";
@@ -84,10 +87,13 @@ async function sendMessage() {
   chatBoard.scrollTop = chatBoard.scrollHeight;
 
   try {
+    // 调用后端API
     const result = await sendMessageToBackend(text);
     
+    // 移除加载消息
     chatBoard.removeChild(loadingMsg);
     
+    // 显示结果
     const botMsg = document.createElement("div");
     botMsg.className = "msg bot";
     botMsg.innerHTML = `<strong>[${result.intent || '智能助手'}]</strong><br/>${result.answer}`;
@@ -95,6 +101,7 @@ async function sendMessage() {
     chatBoard.scrollTop = chatBoard.scrollHeight;
     
   } catch (error) {
+    // 移除加载消息并显示错误
     chatBoard.removeChild(loadingMsg);
     const errorMsg = document.createElement("div");
     errorMsg.className = "msg bot";
