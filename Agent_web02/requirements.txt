@@ -11,3 +11,4 @@ python-dotenv
 requests
 gunicorn
 dashscope
+faiss-cpu
