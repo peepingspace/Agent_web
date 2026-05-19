@@ -1,3 +1,4 @@
+print("🔥 程序开始执行！")
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import traceback
@@ -8,30 +9,18 @@ print("=" * 50)
 print("开始启动 Flask 后端服务...")
 print("=" * 50)
 
-try:
-    print("[1/3] 导入 Flask 模块...")
-    from flask import Flask, request, jsonify
-    from flask_cors import CORS
-    print("✓ Flask 导入成功")
-except Exception as e:
-    print(f"✗ Flask 导入失败: {e}")
-    print("请运行: pip install flask flask-cors")
-    sys.exit(1)
-
-print("\n[2/3] 导入 Agent 模块...")
+# ====================== 导入 Agent ======================
+print("\n[1/2] 导入 Agent 模块...")
 try:
     from Agent import build_graph
     print("✓ Agent 模块导入成功")
 except Exception as e:
     print(f"✗ Agent 模块导入失败: {e}")
-    print("\n详细错误信息:")
     traceback.print_exc()
-    print("\n可能的原因:")
-    print("  1. 缺少依赖包，请运行: pip install langgraph langchain langchain-community langchain-deepseek langchain-chroma chromadb docx2txt python-dotenv requests")
-    print("  2. API Key 未配置，请检查 .env 文件")
     sys.exit(1)
 
-print("\n[3/3] 初始化 Agent 图...")
+# ====================== 初始化 Agent ======================
+print("\n[2/2] 初始化 Agent 图...")
 try:
     agent_graph = build_graph()
     print("✓ Agent 图初始化成功")
@@ -44,17 +33,18 @@ print("\n" + "=" * 50)
 print("✓ 所有模块加载完成！")
 print("=" * 50)
 
+# ====================== Flask 初始化 ======================
 app = Flask(__name__)
 
-# 从环境变量读取允许的前端域名
-allowed_origins = os.getenv('ALLOWED_ORIGINS', 'http://localhost:5500,http://localhost:8080').split(',')
-CORS(app, origins=allowed_origins)
+# 🔥 修复跨域：允许所有来源访问（本地开发必开）
+CORS(app, resources={r"/*": {"origins": "*"}})
 
+# ====================== 聊天接口 ======================
 @app.route('/api/chat', methods=['POST'])
 def chat():
     try:
         data = request.json
-        question = data.get('question', '')
+        question = data.get('question', '').strip()
         
         if not question:
             return jsonify({'error': '问题不能为空'}), 400
@@ -72,29 +62,51 @@ def chat():
             "iteration": 0
         })
         
-        print(f"✓ 意图: {result['intent']}")
-        print(f"✓ 回答: {result['answer'][:50]}...")
+        answer = result.get("answer", "未生成回答")
+        intent = result.get("intent", "unknown")
+        
+        print(f"✓ 意图: {intent}")
+        print(f"✓ 回答: {answer[:50]}...")
         
         return jsonify({
             'success': True,
-            'answer': result['answer'],
-            'intent': result['intent']
+            'answer': answer,
+            'intent': intent
         })
         
     except Exception as e:
-        print(f"✗ 处理请求时出错: {e}")
+        print(f"✗ 处理请求出错: {e}")
         traceback.print_exc()
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': f'服务器错误：{str(e)}'}), 500
 
+# ====================== 健康检查 ======================
 @app.route('/health', methods=['GET'])
 def health():
-    return jsonify({'status': 'ok', 'message': 'Backend is running'})
+    return jsonify({
+        'status': 'ok',
+        'message': 'Backend is running',
+        'agent_loaded': True
+    })
 
+# ====================== 启动 ======================
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    print("\n🚀 启动服务器...")
-    print(f"📡 地址: http://0.0.0.0:{port}")
-    print("💬 API: http://0.0.0.0:{port}/api/chat")
+
+    
+    # app.run(host='0.0.0.0', port=port, debug=False)  # 关闭 debug
+    # print("\n🚀 服务器启动成功！")
+    # print(f"📡 访问地址: http://127.0.0.1:{port}")
+    # print(f"💬 聊天接口: http://127.0.0.1:{port}/api/chat")
+    # print(f"✅ 健康检查: http://127.0.0.1:{port}/health")
+    # print("\n按 Ctrl+C 停止服务\n")
+    # app.run(host='0.0.0.0', port=port, debug=True)
+
+    # ====================== 【修复版：正确启动，只运行一次 app.run】======================
+    print("\n🚀 服务器启动成功！")
+    print(f"📡 访问地址: http://127.0.0.1:{port}")
+    print(f"💬 聊天接口: http://127.0.0.1:{port}/api/chat")
+    print(f"✅ 健康检查: http://127.0.0.1:{port}/health")
     print("\n按 Ctrl+C 停止服务\n")
-    app.run(host='0.0.0.0', port=port, debug=False)
-    print(f"✓ Agent 模块最后修改时间: {os.path.getmtime('Agent.py')}")
+
+    # 🔥 关键修复：只启动一次服务器，不会崩溃
+    app.run(host='0.0.0.0', port=port, debug=True)
